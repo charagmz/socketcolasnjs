@@ -7,6 +7,8 @@ const socketController = (socket) => {
     //Enviar mensaje al que se esta conectando
     socket.emit('ultimo-ticket', ticketControl.ultimo);
 
+    socket.emit('estado-actual', ticketControl.ultimos4);
+
     //console.log('Cliente conectado', socket.id );
     socket.on('disconnect', () => {
         //console.log('Cliente desconectado', socket.id );
@@ -30,7 +32,9 @@ const socketController = (socket) => {
         }
 
         const ticket = ticketControl.atenderTicket(escritorio);
-        //TODO: Notificar cambio en los ultimos4
+        // Notificar cambio en los ultimos4
+        socket.broadcast.emit('estado-actual', ticketControl.ultimos4);
+        
         if (!ticket) {
             return callback({
                 ok: false,
