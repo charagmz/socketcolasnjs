@@ -4,10 +4,10 @@ const ticketControl = new TicketContol();
 
 const socketController = (socket) => {
     
-    //Enviar mensaje al que se esta conectando
+    // Mensajes cuando un cliente se conecta
     socket.emit('ultimo-ticket', ticketControl.ultimo);
-
     socket.emit('estado-actual', ticketControl.ultimos4);
+    socket.emit('tickets-pendientes', ticketControl.tickets.length);
 
     //console.log('Cliente conectado', socket.id );
     socket.on('disconnect', () => {
@@ -18,7 +18,7 @@ const socketController = (socket) => {
         
         const siguiente = ticketControl.siguiente();
         callback(siguiente);
-
+        socket.broadcast.emit('tickets-pendientes', ticketControl.tickets.length);
         //socket.broadcast.emit('enviar-mensaje', payload );
 
     });
@@ -34,6 +34,8 @@ const socketController = (socket) => {
         const ticket = ticketControl.atenderTicket(escritorio);
         // Notificar cambio en los ultimos4
         socket.broadcast.emit('estado-actual', ticketControl.ultimos4);
+        socket.broadcast.emit('tickets-pendientes', ticketControl.tickets.length);
+        socket.emit('tickets-pendientes', ticketControl.tickets.length);
         
         if (!ticket) {
             return callback({
